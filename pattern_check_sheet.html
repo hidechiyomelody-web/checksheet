@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体重増加パターン チェックシート</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: #f5f4f0; min-height: 100vh; padding: 2rem 1rem; }
+.sheet { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 2rem 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.sheet-title { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+.sheet-sub { font-size: 13px; color: #888; margin-bottom: 1.75rem; line-height: 1.6; }
+.pattern-block { border: 1px solid #e8e6e0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.pattern-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+.pattern-badge { font-size: 12px; font-weight: 600; padding: 3px 12px; border-radius: 20px; }
+.badge-a { background: #E1F5EE; color: #0F6E56; }
+.badge-b { background: #FAEEDA; color: #854F0B; }
+.badge-c { background: #FCEBEB; color: #A32D2D; }
+.pattern-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.check-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0ede8; cursor: pointer; user-select: none; }
+.check-item:last-of-type { border-bottom: none; }
+.check-item:hover { opacity: 0.75; }
+.check-box { width: 20px; height: 20px; border: 1.5px solid #ccc; border-radius: 5px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s; }
+.check-box.checked-a { background: #1D9E75; border-color: #1D9E75; }
+.check-box.checked-b { background: #BA7517; border-color: #BA7517; }
+.check-box.checked-c { background: #E24B4A; border-color: #E24B4A; }
+.check-box svg { display: none; }
+.check-box.checked-a svg, .check-box.checked-b svg, .check-box.checked-c svg { display: block; }
+.check-label { font-size: 14px; color: #1a1a1a; line-height: 1.6; flex: 1; }
+.counter { font-size: 12px; color: #aaa; margin-top: 8px; text-align: right; }
+.result-block { border: 1px solid #e8e6e0; border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem; background: #faf9f7; }
+.result-label { font-size: 12px; color: #aaa; margin-bottom: 6px; letter-spacing: 0.05em; }
+.result-text { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.result-desc { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.7; }
+.bar-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.bar-label { font-size: 12px; color: #888; width: 14px; font-weight: 600; }
+.bar-bg { flex: 1; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+.bar-a { background: #1D9E75; }
+.bar-b { background: #BA7517; }
+.bar-c { background: #E24B4A; }
+.bar-count { font-size: 12px; color: #888; width: 20px; text-align: right; }
+.reset-btn { margin-top: 1.25rem; font-size: 13px; color: #888; background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 16px; cursor: pointer; display: block; }
+.reset-btn:hover { background: #f5f4f0; }
+.footer { text-align: center; font-size: 11px; color: #bbb; margin-top: 2rem; }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <p class="sheet-title">体重増加パターン チェックシート</p>
+  <p class="sheet-sub">当てはまる項目にチェックを入れてください。最も多く当てはまったパターンがあなたの現状です。</p>
+
+  <div class="pattern-block">
+    <div class="pattern-header">
+      <span class="pattern-badge badge-a">パターン A</span>
+      <span class="pattern-name">回復・修復フェーズ型</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'a')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">眠れるようになった、または睡眠の質が上がった</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'a')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">手足の冷えが改善してきた</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'a')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">気分やメンタルが安定してきた</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'a')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">肌や髪のコンディションが変わってきた</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'a')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">午前中のだるさが減った</span>
+    </div>
+    <p class="counter" id="count-a">0 / 5項目</p>
+  </div>
+
+  <div class="pattern-block">
+    <div class="pattern-header">
+      <span class="pattern-badge badge-b">パターン B</span>
+      <span class="pattern-name">消化力不足型</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">食後に胃がもたれる、または重い感じがある</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">お腹が張る、ガスが多くなった</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">便の状態が変わった（下痢・便秘・臭いの変化）</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">食事量を増やしたのに疲れが抜けない</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">食事中または食後にすぐ満腹になる</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'b')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">肉・卵などタンパク質を食べると不快感がある</span>
+    </div>
+    <p class="counter" id="count-b">0 / 6項目</p>
+  </div>
+
+  <div class="pattern-block">
+    <div class="pattern-header">
+      <span class="pattern-badge badge-c">パターン C</span>
+      <span class="pattern-name">インスリン過多型</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">甘いものへの欲求がまだある（減っていない）</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">食後に眠くなることが多い</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">間食が習慣になっている（1日2回以上）</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">スイーツや甘い飲み物をタンパク質と一緒に摂っている</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">空腹を感じる前に食べてしまうことが多い</span>
+    </div>
+    <div class="check-item" onclick="toggle(this,'c')">
+      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+      <span class="check-label">米・芋・パンなどの量が以前と変わっていない</span>
+    </div>
+    <p class="counter" id="count-c">0 / 6項目</p>
+  </div>
+
+  <div class="result-block">
+    <p class="result-label">判定結果</p>
+    <p class="result-text" id="result-title">チェックを入れると判定されます</p>
+    <p class="result-desc" id="result-desc"></p>
+    <div style="margin-top: 12px;">
+      <div class="bar-row">
+        <span class="bar-label">A</span>
+        <div class="bar-bg"><div class="bar-fill bar-a" id="bar-a" style="width:0%"></div></div>
+        <span class="bar-count" id="num-a">0</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">B</span>
+        <div class="bar-bg"><div class="bar-fill bar-b" id="bar-b" style="width:0%"></div></div>
+        <span class="bar-count" id="num-b">0</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">C</span>
+        <div class="bar-bg"><div class="bar-fill bar-c" id="bar-c" style="width:0%"></div></div>
+        <span class="bar-count" id="num-c">0</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">リセット</button>
+  <p class="footer">分子栄養学 体重増加パターン判定シート</p>
+</div>
+
+<script>
+const counts = { a: 0, b: 0, c: 0 };
+const totals = { a: 5, b: 6, c: 6 };
+const results = {
+  a: { title: 'パターン A：回復・修復フェーズ型', desc: '体が栄養を得て修復モードに入っています。体調の改善が続いているなら、このフェーズは自然に抜けます。ただし3ヶ月を超えても体重増加が続く場合は、BまたはCも確認してください。' },
+  b: { title: 'パターン B：消化力不足型', desc: '量だけが先に増えた状態です。まずタンパク質の量をいったん落とし、消化を整えることが先決です。よく噛む・食前に味噌汁・食事中の水分を減らすことから始めてください。' },
+  c: { title: 'パターン C：インスリン過多型（最も多いパターン）', desc: '糖質が残ったままタンパク質を増やしている状態です。インスリンが出ている間は脂肪燃焼にブレーキがかかります。まず間食をやめ、甘いものをタンパク質に置き換えることが最初の一手です。' },
+  tie: { title: '複数パターンが混在しています', desc: 'BとCが同数の場合は、まずCの対策（糖質・間食の見直し）から始めてください。AとBまたはCが混在する場合は、体調改善の項目を確認しながらBまたはCの対策を進めてください。' }
+};
+
+function toggle(el, pattern) {
+  const box = el.querySelector('.check-box');
+  const isChecked = box.classList.contains('checked-' + pattern);
+  if (isChecked) {
+    box.classList.remove('checked-' + pattern);
+    counts[pattern]--;
+  } else {
+    box.classList.add('checked-' + pattern);
+    counts[pattern]++;
+  }
+  document.getElementById('count-' + pattern).textContent = counts[pattern] + ' / ' + totals[pattern] + '項目';
+  updateResult();
+}
+
+function updateResult() {
+  const total = counts.a + counts.b + counts.c;
+  const pct = {
+    a: Math.round(counts.a / totals.a * 100),
+    b: Math.round(counts.b / totals.b * 100),
+    c: Math.round(counts.c / totals.c * 100)
+  };
+  document.getElementById('bar-a').style.width = pct.a + '%';
+  document.getElementById('bar-b').style.width = pct.b + '%';
+  document.getElementById('bar-c').style.width = pct.c + '%';
+  document.getElementById('num-a').textContent = counts.a;
+  document.getElementById('num-b').textContent = counts.b;
+  document.getElementById('num-c').textContent = counts.c;
+  if (total === 0) {
+    document.getElementById('result-title').textContent = 'チェックを入れると判定されます';
+    document.getElementById('result-desc').textContent = '';
+    return;
+  }
+  const maxPct = Math.max(pct.a, pct.b, pct.c);
+  const winners = ['a','b','c'].filter(k => pct[k] === maxPct && counts[k] > 0);
+  const winner = winners.length === 1 ? winners[0] : 'tie';
+  document.getElementById('result-title').textContent = results[winner].title;
+  document.getElementById('result-desc').textContent = results[winner].desc;
+}
+
+function resetAll() {
+  counts.a = 0; counts.b = 0; counts.c = 0;
+  document.querySelectorAll('.check-box').forEach(b => {
+    b.classList.remove('checked-a','checked-b','checked-c');
+  });
+  ['a','b','c'].forEach(p => {
+    document.getElementById('count-' + p).textContent = '0 / ' + totals[p] + '項目';
+    document.getElementById('bar-' + p).style.width = '0%';
+    document.getElementById('num-' + p).textContent = '0';
+  });
+  document.getElementById('result-title').textContent = 'チェックを入れると判定されます';
+  document.getElementById('result-desc').textContent = '';
+}
+</script>
+</body>
+</html>
