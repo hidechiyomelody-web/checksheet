@@ -312,6 +312,15 @@ function resetAll() {
 // ── YouTube Transcript ──
 let transcriptData = [];
 let allTracks = [];
+let activeHost = '';
+
+const INVIDIOUS = [
+  'https://yewtu.be',
+  'https://inv.riverside.rocks',
+  'https://invidious.nerdvpn.de',
+  'https://iv.datura.network',
+  'https://invidious.privacyredirect.com',
+];
 
 function extractVideoId(input) {
   input = input.trim();
@@ -339,54 +348,88 @@ function setStatus(msg, isError) {
   el.style.color = isError ? '#E24B4A' : '#888';
 }
 
-function extractJsonArray(html, searchKey) {
-  const idx = html.indexOf(searchKey);
-  if (idx === -1) return null;
-  const start = html.indexOf('[', idx + searchKey.length);
-  if (start === -1) return null;
-  let depth = 0, inStr = false, escaped = false;
-  for (let i = start; i < html.length; i++) {
-    if (escaped) { escaped = false; continue; }
-    if (html[i] === '\\' && inStr) { escaped = true; continue; }
-    if (html[i] === '"') { inStr = !inStr; continue; }
-    if (inStr) continue;
-    if (html[i] === '[') depth++;
-    else if (html[i] === ']') {
-      depth--;
-      if (depth === 0) return html.substring(start, i + 1);
-    }
+async function tryFetch(url, timeout) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout || 12000);
+  try {
+    const resp = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
+    return resp.ok ? resp : null;
+  } catch (e) {
+    clearTimeout(timer);
+    return null;
+  }
+}
+
+function parseVTT(text) {
+  const segments = [];
+  const blocks = text.split(/\n\n+/);
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    const timeLine = lines.find(l => l.includes('-->'));
+    if (!timeLine) continue;
+    const m = timeLine.match(/^(\d+:\d+[\d:.]+)/);
+    const start = m ? parseTimestamp(m[1]) : 0;
+    const textLines = lines.filter(l => !l.includes('-->') && !/^\d+$/.test(l.trim()) && l.trim() !== 'WEBVTT');
+    const txt = textLines.join(' ').replace(/<[^>]+>/g, '').trim();
+    if (txt) segments.push({ start, text: txt });
+  }
+  return segments;
+}
+
+function parseTimestamp(ts) {
+  const parts = ts.split(':').map(parseFloat);
+  return parts.length === 3 ? parts[0]*3600 + parts[1]*60 + parts[2] : parts[0]*60 + parts[1];
+}
+
+async function getCaptionTracksFromInvidious(videoId) {
+  for (const host of INVIDIOUS) {
+    const resp = await tryFetch(host + '/api/v1/captions/' + videoId);
+    if (!resp) continue;
+    try {
+      const data = await resp.json();
+      if (data.captions && data.captions.length > 0) {
+        activeHost = host;
+        return data.captions.map(c => ({
+          label: c.label,
+          languageCode: c.language_code,
+          name: { simpleText: c.label },
+          _invidiousUrl: host + c.url
+        }));
+      }
+    } catch (e) {}
   }
   return null;
 }
 
-async function fetchWithProxy(url) {
-  const targets = [
-    'https://corsproxy.io/?' + encodeURIComponent(url),
-    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
-  ];
-  for (const proxyUrl of targets) {
-    try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 15000);
-      const resp = await fetch(proxyUrl, { signal: controller.signal });
-      clearTimeout(timer);
-      if (resp.ok) return resp;
-    } catch (e) {}
-  }
-  throw new Error('ネットワークエラー：プロキシに接続できませんでした');
-}
-
 async function loadTrack(track) {
-  const resp = await fetchWithProxy(track.baseUrl);
-  const xml = await resp.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, 'text/xml');
-  const nodes = Array.from(doc.querySelectorAll('text'));
-  if (nodes.length === 0) throw new Error('文字起こしデータが空です');
-  return nodes.map(n => ({
-    start: parseFloat(n.getAttribute('start') || '0'),
-    text: decodeEntities(n.textContent.replace(/\n/g, ' ').trim())
-  })).filter(s => s.text);
+  if (track._invidiousUrl) {
+    const resp = await tryFetch(track._invidiousUrl);
+    if (!resp) throw new Error('字幕の取得に失敗しました');
+    const text = await resp.text();
+    const segments = parseVTT(text);
+    if (segments.length === 0) throw new Error('文字起こしデータが空です');
+    return segments;
+  }
+  const proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(track.baseUrl),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(track.baseUrl),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(track.baseUrl),
+  ];
+  for (const url of proxies) {
+    const resp = await tryFetch(url, 15000);
+    if (!resp) continue;
+    const xml = await resp.text();
+    const doc = new DOMParser().parseFromString(xml, 'text/xml');
+    const nodes = Array.from(doc.querySelectorAll('text'));
+    if (nodes.length > 0) {
+      return nodes.map(n => ({
+        start: parseFloat(n.getAttribute('start') || '0'),
+        text: decodeEntities(n.textContent.replace(/\n/g, ' ').trim())
+      })).filter(s => s.text);
+    }
+  }
+  throw new Error('文字起こしデータの取得に失敗しました');
 }
 
 function renderTranscript(data) {
@@ -410,27 +453,14 @@ async function fetchTranscript() {
   allTracks = [];
 
   try {
-    setStatus('動画ページを取得中...');
-    const resp = await fetchWithProxy('https://www.youtube.com/watch?v=' + videoId);
-    const html = await resp.text();
-
-    const json = extractJsonArray(html, '"captionTracks":');
-    if (!json) {
-      throw new Error(
-        html.includes('videoUnavailable') || html.includes('"status":"ERROR"')
-          ? '動画が存在しないか、非公開です'
-          : 'この動画には字幕・文字起こしがありません'
-      );
-    }
-
-    allTracks = JSON.parse(json);
-    if (!allTracks.length) throw new Error('字幕トラックが見つかりませんでした');
+    setStatus('字幕トラックを検索中...');
+    allTracks = await getCaptionTracksFromInvidious(videoId);
+    if (!allTracks || allTracks.length === 0) throw new Error('この動画には字幕・文字起こしがありません');
 
     const sel = document.getElementById('yt-track-select');
     sel.innerHTML = allTracks.map((t, i) => {
       const name = (t.name && t.name.simpleText) || t.languageCode || ('トラック' + (i + 1));
-      const asr = t.kind === 'asr' ? '（自動生成）' : '';
-      return '<option value="' + i + '">' + name + asr + '</option>';
+      return '<option value="' + i + '">' + name + '</option>';
     }).join('');
 
     const prefLang = document.getElementById('yt-lang').value;
