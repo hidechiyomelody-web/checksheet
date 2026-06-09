@@ -7,7 +7,16 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif; background: #f5f4f0; min-height: 100vh; padding: 2rem 1rem; }
-.sheet { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 2rem 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.sheet { max-width: 680px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+/* Tab navigation */
+.tab-nav { display: flex; margin-bottom: 1.75rem; border-bottom: 2px solid #e8e6e0; }
+.tab-btn { flex: 1; padding: 10px 8px; font-size: 13px; font-weight: 500; background: none; border: none; border-bottom: 2px solid transparent; color: #888; cursor: pointer; margin-bottom: -2px; font-family: inherit; transition: color 0.15s, border-color 0.15s; }
+.tab-btn.active { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Checklist styles */
 .sheet-title { font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
 .sheet-sub { font-size: 13px; color: #888; margin-bottom: 1.75rem; line-height: 1.6; }
 .pattern-block { border: 1px solid #e8e6e0; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
@@ -40,136 +49,204 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragin
 .bar-b { background: #BA7517; }
 .bar-c { background: #E24B4A; }
 .bar-count { font-size: 12px; color: #888; width: 20px; text-align: right; }
-.reset-btn { margin-top: 1.25rem; font-size: 13px; color: #888; background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 16px; cursor: pointer; display: block; }
+.reset-btn { margin-top: 1.25rem; font-size: 13px; color: #888; background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 16px; cursor: pointer; display: block; font-family: inherit; }
 .reset-btn:hover { background: #f5f4f0; }
 .footer { text-align: center; font-size: 11px; color: #bbb; margin-top: 2rem; }
+
+/* YouTube transcript styles */
+.yt-input-wrap { display: flex; gap: 8px; margin-bottom: 10px; }
+.yt-input { flex: 1; border: 1px solid #ddd; border-radius: 8px; padding: 11px 12px; font-size: 14px; outline: none; font-family: inherit; color: #1a1a1a; min-width: 0; }
+.yt-input:focus { border-color: #888; }
+.yt-fetch-btn { background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 11px 16px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; font-family: inherit; flex-shrink: 0; }
+.yt-fetch-btn:disabled { background: #bbb; cursor: not-allowed; }
+.yt-options { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; color: #666; }
+.yt-options select { border: 1px solid #ddd; border-radius: 6px; padding: 5px 8px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; }
+.yt-options label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.yt-tracks { margin-bottom: 10px; display: none; }
+.yt-tracks select { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; background: #fff; color: #1a1a1a; }
+.yt-status { font-size: 13px; color: #888; margin-bottom: 8px; min-height: 18px; }
+.yt-result { border: 1px solid #e8e6e0; border-radius: 12px; padding: 1rem; background: #faf9f7; max-height: 50vh; overflow-y: auto; font-size: 13px; line-height: 1.9; display: none; }
+.yt-segment { padding: 2px 0; }
+.yt-time { color: #bbb; font-size: 11px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.yt-copy-btn { margin-top: 10px; font-size: 13px; color: #888; background: none; border: 1px solid #ddd; border-radius: 8px; padding: 7px 16px; cursor: pointer; display: none; font-family: inherit; }
+.yt-copy-btn:hover { background: #f5f4f0; }
 </style>
 </head>
 <body>
 <div class="sheet">
-  <p class="sheet-title">体重増加パターン チェックシート</p>
-  <p class="sheet-sub">当てはまる項目にチェックを入れてください。最も多く当てはまったパターンがあなたの現状です。</p>
 
-  <div class="pattern-block">
-    <div class="pattern-header">
-      <span class="pattern-badge badge-a">パターン A</span>
-      <span class="pattern-name">回復・修復フェーズ型</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'a')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">眠れるようになった、または睡眠の質が上がった</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'a')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">手足の冷えが改善してきた</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'a')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">気分やメンタルが安定してきた</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'a')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">肌や髪のコンディションが変わってきた</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'a')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">午前中のだるさが減った</span>
-    </div>
-    <p class="counter" id="count-a">0 / 5項目</p>
+  <div class="tab-nav">
+    <button class="tab-btn active" data-tab="check" onclick="switchTab('check')">チェックシート</button>
+    <button class="tab-btn" data-tab="youtube" onclick="switchTab('youtube')">YouTube文字起こし</button>
   </div>
 
-  <div class="pattern-block">
-    <div class="pattern-header">
-      <span class="pattern-badge badge-b">パターン B</span>
-      <span class="pattern-name">消化力不足型</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">食後に胃がもたれる、または重い感じがある</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">お腹が張る、ガスが多くなった</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">便の状態が変わった（下痢・便秘・臭いの変化）</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">食事量を増やしたのに疲れが抜けない</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">食事中または食後にすぐ満腹になる</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'b')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">肉・卵などタンパク質を食べると不快感がある</span>
-    </div>
-    <p class="counter" id="count-b">0 / 6項目</p>
-  </div>
+  <!-- Tab 1: Checklist -->
+  <div class="tab-content active" id="tab-check">
+    <p class="sheet-title">体重増加パターン チェックシート</p>
+    <p class="sheet-sub">当てはまる項目にチェックを入れてください。最も多く当てはまったパターンがあなたの現状です。</p>
 
-  <div class="pattern-block">
-    <div class="pattern-header">
-      <span class="pattern-badge badge-c">パターン C</span>
-      <span class="pattern-name">インスリン過多型</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">甘いものへの欲求がまだある（減っていない）</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">食後に眠くなることが多い</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">間食が習慣になっている（1日2回以上）</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">スイーツや甘い飲み物をタンパク質と一緒に摂っている</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">空腹を感じる前に食べてしまうことが多い</span>
-    </div>
-    <div class="check-item" onclick="toggle(this,'c')">
-      <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-      <span class="check-label">米・芋・パンなどの量が以前と変わっていない</span>
-    </div>
-    <p class="counter" id="count-c">0 / 6項目</p>
-  </div>
-
-  <div class="result-block">
-    <p class="result-label">判定結果</p>
-    <p class="result-text" id="result-title">チェックを入れると判定されます</p>
-    <p class="result-desc" id="result-desc"></p>
-    <div style="margin-top: 12px;">
-      <div class="bar-row">
-        <span class="bar-label">A</span>
-        <div class="bar-bg"><div class="bar-fill bar-a" id="bar-a" style="width:0%"></div></div>
-        <span class="bar-count" id="num-a">0</span>
+    <div class="pattern-block">
+      <div class="pattern-header">
+        <span class="pattern-badge badge-a">パターン A</span>
+        <span class="pattern-name">回復・修復フェーズ型</span>
       </div>
-      <div class="bar-row">
-        <span class="bar-label">B</span>
-        <div class="bar-bg"><div class="bar-fill bar-b" id="bar-b" style="width:0%"></div></div>
-        <span class="bar-count" id="num-b">0</span>
+      <div class="check-item" onclick="toggle(this,'a')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">眠れるようになった、または睡眠の質が上がった</span>
       </div>
-      <div class="bar-row">
-        <span class="bar-label">C</span>
-        <div class="bar-bg"><div class="bar-fill bar-c" id="bar-c" style="width:0%"></div></div>
-        <span class="bar-count" id="num-c">0</span>
+      <div class="check-item" onclick="toggle(this,'a')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">手足の冷えが改善してきた</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'a')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">気分やメンタルが安定してきた</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'a')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">肌や髪のコンディションが変わってきた</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'a')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">午前中のだるさが減った</span>
+      </div>
+      <p class="counter" id="count-a">0 / 5項目</p>
+    </div>
+
+    <div class="pattern-block">
+      <div class="pattern-header">
+        <span class="pattern-badge badge-b">パターン B</span>
+        <span class="pattern-name">消化力不足型</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">食後に胃がもたれる、または重い感じがある</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">お腹が張る、ガスが多くなった</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">便の状態が変わった（下痢・便秘・臭いの変化）</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">食事量を増やしたのに疲れが抜けない</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">食事中または食後にすぐ満腹になる</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'b')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">肉・卵などタンパク質を食べると不快感がある</span>
+      </div>
+      <p class="counter" id="count-b">0 / 6項目</p>
+    </div>
+
+    <div class="pattern-block">
+      <div class="pattern-header">
+        <span class="pattern-badge badge-c">パターン C</span>
+        <span class="pattern-name">インスリン過多型</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">甘いものへの欲求がまだある（減っていない）</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">食後に眠くなることが多い</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">間食が習慣になっている（1日2回以上）</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">スイーツや甘い飲み物をタンパク質と一緒に摂っている</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">空腹を感じる前に食べてしまうことが多い</span>
+      </div>
+      <div class="check-item" onclick="toggle(this,'c')">
+        <div class="check-box"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="check-label">米・芋・パンなどの量が以前と変わっていない</span>
+      </div>
+      <p class="counter" id="count-c">0 / 6項目</p>
+    </div>
+
+    <div class="result-block">
+      <p class="result-label">判定結果</p>
+      <p class="result-text" id="result-title">チェックを入れると判定されます</p>
+      <p class="result-desc" id="result-desc"></p>
+      <div style="margin-top: 12px;">
+        <div class="bar-row">
+          <span class="bar-label">A</span>
+          <div class="bar-bg"><div class="bar-fill bar-a" id="bar-a" style="width:0%"></div></div>
+          <span class="bar-count" id="num-a">0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">B</span>
+          <div class="bar-bg"><div class="bar-fill bar-b" id="bar-b" style="width:0%"></div></div>
+          <span class="bar-count" id="num-b">0</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">C</span>
+          <div class="bar-bg"><div class="bar-fill bar-c" id="bar-c" style="width:0%"></div></div>
+          <span class="bar-count" id="num-c">0</span>
+        </div>
       </div>
     </div>
+
+    <button class="reset-btn" onclick="resetAll()">リセット</button>
+    <p class="footer">分子栄養学 体重増加パターン判定シート</p>
   </div>
 
-  <button class="reset-btn" onclick="resetAll()">リセット</button>
-  <p class="footer">分子栄養学 体重増加パターン判定シート</p>
+  <!-- Tab 2: YouTube Transcript -->
+  <div class="tab-content" id="tab-youtube">
+    <p class="sheet-title" style="margin-bottom: 4px;">YouTube 文字起こし</p>
+    <p class="sheet-sub">YouTube動画のURLまたは動画IDを入力して文字起こしを取得します。</p>
+
+    <div class="yt-input-wrap">
+      <input type="text" id="yt-url" class="yt-input" placeholder="YouTube URL または 動画ID" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button id="yt-fetch-btn" class="yt-fetch-btn" onclick="fetchTranscript()">取得</button>
+    </div>
+
+    <div class="yt-options">
+      <span>言語:</span>
+      <select id="yt-lang">
+        <option value="ja">日本語優先</option>
+        <option value="en">英語優先</option>
+        <option value="">自動（最初のトラック）</option>
+      </select>
+      <label>
+        <input type="checkbox" id="yt-show-ts">
+        タイムスタンプ
+      </label>
+    </div>
+
+    <div class="yt-tracks" id="yt-tracks">
+      <select id="yt-track-select" onchange="onTrackChange()"></select>
+    </div>
+
+    <p class="yt-status" id="yt-status"></p>
+    <div class="yt-result" id="yt-result"></div>
+    <button class="yt-copy-btn" id="yt-copy-btn" onclick="copyTranscript()">全文コピー</button>
+  </div>
+
 </div>
 
 <script>
+// ── Tab switching ──
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// ── Checklist ──
 const counts = { a: 0, b: 0, c: 0 };
 const totals = { a: 5, b: 6, c: 6 };
 const results = {
@@ -230,6 +307,197 @@ function resetAll() {
   });
   document.getElementById('result-title').textContent = 'チェックを入れると判定されます';
   document.getElementById('result-desc').textContent = '';
+}
+
+// ── YouTube Transcript ──
+let transcriptData = [];
+let allTracks = [];
+
+function extractVideoId(input) {
+  input = input.trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  const m = input.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function formatTime(s) {
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
+  return h > 0
+    ? h + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0')
+    : m + ':' + String(sec).padStart(2,'0');
+}
+
+function decodeEntities(text) {
+  const ta = document.createElement('textarea');
+  ta.innerHTML = text;
+  return ta.value;
+}
+
+function setStatus(msg, isError) {
+  const el = document.getElementById('yt-status');
+  el.textContent = msg;
+  el.style.color = isError ? '#E24B4A' : '#888';
+}
+
+function extractJsonArray(html, searchKey) {
+  const idx = html.indexOf(searchKey);
+  if (idx === -1) return null;
+  const start = html.indexOf('[', idx + searchKey.length);
+  if (start === -1) return null;
+  let depth = 0, inStr = false, escaped = false;
+  for (let i = start; i < html.length; i++) {
+    if (escaped) { escaped = false; continue; }
+    if (html[i] === '\\' && inStr) { escaped = true; continue; }
+    if (html[i] === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (html[i] === '[') depth++;
+    else if (html[i] === ']') {
+      depth--;
+      if (depth === 0) return html.substring(start, i + 1);
+    }
+  }
+  return null;
+}
+
+async function fetchWithProxy(url) {
+  const targets = [
+    'https://corsproxy.io/?' + encodeURIComponent(url),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+  ];
+  for (const proxyUrl of targets) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+      const resp = await fetch(proxyUrl, { signal: controller.signal });
+      clearTimeout(timer);
+      if (resp.ok) return resp;
+    } catch (e) {}
+  }
+  throw new Error('ネットワークエラー：プロキシに接続できませんでした');
+}
+
+async function loadTrack(track) {
+  const resp = await fetchWithProxy(track.baseUrl);
+  const xml = await resp.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'text/xml');
+  const nodes = Array.from(doc.querySelectorAll('text'));
+  if (nodes.length === 0) throw new Error('文字起こしデータが空です');
+  return nodes.map(n => ({
+    start: parseFloat(n.getAttribute('start') || '0'),
+    text: decodeEntities(n.textContent.replace(/\n/g, ' ').trim())
+  })).filter(s => s.text);
+}
+
+function renderTranscript(data) {
+  const showTs = document.getElementById('yt-show-ts').checked;
+  document.getElementById('yt-result').innerHTML = data.map(seg => {
+    const ts = showTs ? '<span class="yt-time">' + formatTime(seg.start) + '</span>' : '';
+    return '<div class="yt-segment">' + ts + seg.text.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>';
+  }).join('');
+}
+
+async function fetchTranscript() {
+  const videoId = extractVideoId(document.getElementById('yt-url').value);
+  if (!videoId) { setStatus('有効なYouTube URLまたは動画IDを入力してください', true); return; }
+
+  const btn = document.getElementById('yt-fetch-btn');
+  btn.disabled = true;
+  document.getElementById('yt-result').style.display = 'none';
+  document.getElementById('yt-copy-btn').style.display = 'none';
+  document.getElementById('yt-tracks').style.display = 'none';
+  transcriptData = [];
+  allTracks = [];
+
+  try {
+    setStatus('動画ページを取得中...');
+    const resp = await fetchWithProxy('https://www.youtube.com/watch?v=' + videoId);
+    const html = await resp.text();
+
+    const json = extractJsonArray(html, '"captionTracks":');
+    if (!json) {
+      throw new Error(
+        html.includes('videoUnavailable') || html.includes('"status":"ERROR"')
+          ? '動画が存在しないか、非公開です'
+          : 'この動画には字幕・文字起こしがありません'
+      );
+    }
+
+    allTracks = JSON.parse(json);
+    if (!allTracks.length) throw new Error('字幕トラックが見つかりませんでした');
+
+    const sel = document.getElementById('yt-track-select');
+    sel.innerHTML = allTracks.map((t, i) => {
+      const name = (t.name && t.name.simpleText) || t.languageCode || ('トラック' + (i + 1));
+      const asr = t.kind === 'asr' ? '（自動生成）' : '';
+      return '<option value="' + i + '">' + name + asr + '</option>';
+    }).join('');
+
+    const prefLang = document.getElementById('yt-lang').value;
+    let trackIdx = 0;
+    if (prefLang) {
+      let found = allTracks.findIndex(t => t.languageCode === prefLang);
+      if (found === -1) found = allTracks.findIndex(t => (t.languageCode || '').startsWith(prefLang));
+      if (found !== -1) { trackIdx = found; sel.value = String(found); }
+    }
+
+    if (allTracks.length > 1) document.getElementById('yt-tracks').style.display = 'block';
+
+    setStatus('文字起こしを取得中...');
+    transcriptData = await loadTrack(allTracks[trackIdx]);
+    renderTranscript(transcriptData);
+
+    document.getElementById('yt-result').style.display = 'block';
+    document.getElementById('yt-copy-btn').style.display = 'block';
+    setStatus(transcriptData.length + '件のセグメントを取得しました');
+  } catch (e) {
+    setStatus(e.message || 'エラーが発生しました', true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function onTrackChange() {
+  const idx = parseInt(document.getElementById('yt-track-select').value);
+  if (!allTracks[idx]) return;
+  const btn = document.getElementById('yt-fetch-btn');
+  btn.disabled = true;
+  setStatus('文字起こしを切り替え中...');
+  try {
+    transcriptData = await loadTrack(allTracks[idx]);
+    renderTranscript(transcriptData);
+    setStatus(transcriptData.length + '件のセグメントを取得しました');
+  } catch (e) {
+    setStatus(e.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('yt-show-ts').addEventListener('change', () => {
+  if (transcriptData.length) renderTranscript(transcriptData);
+});
+
+document.getElementById('yt-url').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fetchTranscript();
+});
+
+async function copyTranscript() {
+  const text = transcriptData.map(s => s.text).join('\n');
+  const btn = document.getElementById('yt-copy-btn');
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  btn.textContent = 'コピーしました！';
+  setTimeout(() => { btn.textContent = '全文コピー'; }, 1500);
 }
 </script>
 </body>
